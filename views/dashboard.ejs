@@ -1,0 +1,91 @@
+<%- include("partials/header") %>
+<!-- Include Header -->
+
+<h2 class="mb-3">Admin Dashboard</h2>
+
+<!-- Dashboard Stats -->
+<div class="row">
+  <div class="col-md-3">
+    <div class="card text-white bg-primary mb-3 shadow">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-shopping-cart"></i> Total Orders
+        </h5>
+        <h3><%= orders.length %></h3>
+        <p>New this week: <strong>12</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-white bg-success mb-3 shadow">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-dollar-sign"></i> Total Revenue
+        </h5>
+        <h3>$<%= revenue.toLocaleString() %></h3>
+        <p>Last Month: $<%= (revenue * 0.9).toLocaleString() %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-white bg-warning mb-3 shadow">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-users"></i> Total Customers</h5>
+        <h3><%= customers.length %></h3>
+        <p>New Signups: <strong>5</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="card text-white bg-info mb-3 shadow">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-utensils"></i> Menu Items</h5>
+        <h3><%= menuItems.length %></h3>
+        <p>Top Dish: <strong><%= topItem ? topItem.title : 'N/A' %></strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Orders -->
+<div class="card mt-4 shadow">
+  <div class="card-header">
+    <h5><i class="fas fa-list"></i> Recent Orders</h5>
+  </div>
+  <div class="card-body">
+    <table class="table table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.slice(0, 5).forEach(order => { %>
+        <tr>
+          <td>#<%= order._id.toString().slice(-6) %></td>
+          <td><%= order.customer.name %></td>
+          <td>$<%= order.totalAmount.toLocaleString() %></td>
+          <td>
+            <span
+              class="badge bg-<%= order.status === 'Completed' ? 'success' : order.status === 'Processing' ? 'primary' : 'warning' %>"
+            >
+              <%= order.status %>
+            </span>
+          </td>
+          <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include("partials/footer") %>
+<!-- Include Footer -->

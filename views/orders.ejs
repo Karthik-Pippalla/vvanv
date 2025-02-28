@@ -1,0 +1,71 @@
+<%- include("partials/header") %>
+  <body class="container mt-4">
+    <h2 class="mb-4">Order Management</h2>
+
+    <table class="table table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total Amount</th>
+          <th>Status</th>
+          <th>Items & Vendors</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+        <tr>
+          <td>#<%= order._id.toString().slice(-6) %></td>
+          <td><%= order.customer.name %></td>
+          <td>₹<%= order.totalAmount %></td>
+          <td>
+            <% if (order.status === "Pending") { %>
+            <span class="badge bg-warning">Pending</span>
+            <% } else if (order.status === "Processing") { %>
+            <span class="badge bg-primary">Processing</span>
+            <% } else if (order.status === "Completed") { %>
+            <span class="badge bg-success">Completed</span>
+            <% } else { %>
+            <span class="badge bg-danger">Cancelled</span>
+            <% } %>
+          </td>
+          <td>
+            <% order.items.forEach(item => { %>
+              <div>
+                <strong><%= item.menuItem.title %></strong> (x<%= item.quantity %>) 
+                <br>
+                <small class="text-muted">
+                  Vendor: 
+                  <a href="/vendors/<%= item.menuItem.vendor._id %>" class="text-decoration-none">
+                    <%= item.menuItem.vendor.name %>
+                  </a>
+                </small>
+              </div>
+              <hr>
+            <% }) %>
+          </td>
+          <td>
+            <a
+              href="/orders/update/<%= order._id %>?status=Processing"
+              class="btn btn-primary btn-sm"
+              >Process</a
+            >
+            <a
+              href="/orders/update/<%= order._id %>?status=Completed"
+              class="btn btn-success btn-sm"
+              >Complete</a
+            >
+            <a
+              href="/orders/delete/<%= order._id %>"
+              class="btn btn-danger btn-sm"
+              >Cancel</a
+            >
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </body>
+</html>
+<%- include("partials/footer") %>

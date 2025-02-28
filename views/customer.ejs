@@ -1,0 +1,330 @@
+<%- include("partials/header") %>
+<!-- Include Header -->
+
+<h2 class="mb-4">Customer Management</h2>
+
+<!-- Search Bar -->
+<input
+  type="text"
+  id="search-box"
+  class="form-control mb-3"
+  placeholder="Search Customers..."
+/>
+
+<!-- Add New Customer Button -->
+<button
+  class="btn btn-primary mb-3"
+  data-bs-toggle="modal"
+  data-bs-target="#addCustomerModal"
+>
+  + Add New Customer
+</button>
+
+<!-- Customer Table -->
+<table class="table table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Address</th>
+      <th>Orders</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="customer-table">
+    <% customers.forEach(customer => { %>
+    <tr class="customer-row" data-name="<%= customer.name.toLowerCase() %>">
+      <td><%= customer.name %></td>
+      <td><%= customer.email %></td>
+      <td><%= customer.phone %></td>
+      <td><%= customer.address %></td>
+      <td><%= customer.orderHistory.length %> Orders</td>
+      <td>
+        <a href="/customers/<%= customer._id %>" class="btn btn-info btn-sm"
+          >View</a
+        >
+        <button
+          class="btn btn-warning btn-sm edit-btn"
+          data-id="<%= customer._id %>"
+          data-name="<%= customer.name %>"
+          data-email="<%= customer.email %>"
+          data-phone="<%= customer.phone %>"
+          data-address="<%= customer.address %>"
+          data-bs-toggle="modal"
+          data-bs-target="#editCustomerModal"
+        >
+          Edit
+        </button>
+        <button
+          class="btn btn-danger btn-sm delete-btn"
+          data-id="<%= customer._id %>"
+        >
+          Delete
+        </button>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- Pagination -->
+<nav>
+  <ul class="pagination justify-content-center" id="pagination"></ul>
+</nav>
+
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Customer</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="addCustomerForm">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customer-name"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="customer-email"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customer-phone"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customer-address"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Save Customer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Customer Modal -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Customer</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCustomerForm">
+          <input type="hidden" id="edit-customer-id" />
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit-customer-name"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="edit-customer-email"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit-customer-phone"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit-customer-address"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Update Customer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  // Search Functionality
+  document.getElementById("search-box").addEventListener("keyup", function () {
+    let query = this.value.toLowerCase();
+    document.querySelectorAll(".customer-row").forEach((row) => {
+      let name = row.getAttribute("data-name");
+      row.style.display = name.includes(query) ? "table-row" : "none";
+    });
+  });
+
+  // Pagination
+  const itemsPerPage = 5;
+  let customerRows = document.querySelectorAll(".customer-row");
+  let totalPages = Math.ceil(customerRows.length / itemsPerPage);
+
+  function showPage(page) {
+    let start = (page - 1) * itemsPerPage;
+    let end = start + itemsPerPage;
+    customerRows.forEach((row, index) => {
+      row.style.display = index >= start && index < end ? "table-row" : "none";
+    });
+  }
+
+  function renderPagination() {
+    let paginationContainer = document.getElementById("pagination");
+    paginationContainer.innerHTML = "";
+    for (let i = 1; i <= totalPages; i++) {
+      let li = document.createElement("li");
+      li.classList.add("page-item");
+      if (i === 1) li.classList.add("active");
+      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+      li.addEventListener("click", function () {
+        showPage(i);
+        document
+          .querySelectorAll(".page-item")
+          .forEach((el) => el.classList.remove("active"));
+        li.classList.add("active");
+      });
+      paginationContainer.appendChild(li);
+    }
+  }
+
+  showPage(1);
+  renderPagination();
+
+  // Populate Edit Form
+  document.querySelectorAll(".edit-btn").forEach((button) => {
+    button.addEventListener("click", function () {
+      document.getElementById("edit-customer-id").value =
+        this.getAttribute("data-id");
+      document.getElementById("edit-customer-name").value =
+        this.getAttribute("data-name");
+      document.getElementById("edit-customer-email").value =
+        this.getAttribute("data-email");
+      document.getElementById("edit-customer-phone").value =
+        this.getAttribute("data-phone");
+      document.getElementById("edit-customer-address").value =
+        this.getAttribute("data-address");
+    });
+  });
+
+  // ✅ Handle Add Customer Form Submission
+  document
+    .getElementById("addCustomerForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const formData = {
+        name: document.getElementById("customer-name").value,
+        email: document.getElementById("customer-email").value,
+        phone: document.getElementById("customer-phone").value,
+        address: document.getElementById("customer-address").value,
+      };
+
+      const response = await fetch("/customers/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Customer Added Successfully!");
+        location.reload();
+      } else {
+        alert("Error adding customer: " + data.message);
+      }
+    });
+
+  // ✅ Handle Edit Form Submission
+  document
+    .getElementById("editCustomerForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const customerId = document.getElementById("edit-customer-id").value;
+      const formData = {
+        name: document.getElementById("edit-customer-name").value,
+        email: document.getElementById("edit-customer-email").value,
+        phone: document.getElementById("edit-customer-phone").value,
+        address: document.getElementById("edit-customer-address").value,
+      };
+
+      const response = await fetch(`/customers/update/${customerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Customer Updated Successfully!");
+        location.reload();
+      } else {
+        alert("Error updating customer: " + data.message);
+      }
+    });
+
+  // ✅ Handle Delete Customer
+  document.querySelectorAll(".delete-btn").forEach((button) => {
+    button.addEventListener("click", async function () {
+      if (!confirm("Are you sure you want to delete this customer?")) return;
+
+      const customerId = this.getAttribute("data-id");
+      const response = await fetch(`/customers/delete/${customerId}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Customer Deleted Successfully!");
+        location.reload();
+      } else {
+        alert("Error deleting customer: " + data.message);
+      }
+    });
+  });
+</script>
+
+<%- include("partials/footer") %>
+<!-- Include Footer -->

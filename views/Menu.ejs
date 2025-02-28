@@ -1,0 +1,485 @@
+<%- include("partials/header") %>
+<!-- Include Header -->
+
+<h2 class="mb-3">Manage Menu</h2>
+
+<!-- Search Bar -->
+<input
+  type="text"
+  id="search-box"
+  class="form-control mb-3"
+  placeholder="Search Menu Items..."
+/>
+
+<!-- Add New Item Button -->
+<button
+  class="btn btn-primary mb-3"
+  data-bs-toggle="modal"
+  data-bs-target="#addItemModal"
+>
+  + Add New Item
+</button>
+
+<!-- Menu Items as Cards -->
+<div class="row" id="menu-container">
+  <% menu.forEach(item => { %>
+  <div class="col-md-4 menu-item" data-title="<%= item.title.toLowerCase() %>">
+    <div class="card mb-4 shadow">
+      <!-- Menu Item Image -->
+      <img
+        src="<%= item.image_url && item.image_url.startsWith('http') ? item.image_url : 'https://t3.ftcdn.net/jpg/02/57/21/40/360_F_257214005_63auIfr9KN0gTHt28w6G8hoP2k45ScyP.jpg' %>"
+        class="card-img-top"
+        alt="<%= item.title %>"
+        onerror="this.onerror=null; this.src='https://t3.ftcdn.net/jpg/02/57/21/40/360_F_257214005_63auIfr9KN0gTHt28w6G8hoP2k45ScyP.jpg';"
+      />
+
+      <div class="card-body">
+        <!-- Title and Category -->
+        <h5 class="card-title"><%= item.title %></h5>
+        <p class="card-text"><strong>Category:</strong> <%= item.category %></p>
+
+        <!-- Vendor Name -->
+        <p class="card-text">
+          <strong>Vendor:</strong> <%= item.vendor.name %>
+        </p>
+
+        <!-- Price and Stock -->
+        <p class="card-text"><strong>Price:</strong> ₹<%= item.price %></p>
+        <p class="card-text"><strong>Stock:</strong> <%= item.stock %></p>
+
+        <!-- Availability Status -->
+        <p class="card-text">
+          <% if (item.available) { %>
+          <span class="badge bg-success">Available</span>
+          <% } else { %>
+          <span class="badge bg-danger">Out of Stock</span>
+          <% } %>
+        </p>
+
+        <!-- Nutritional Information -->
+        <p class="card-text">
+          <strong>Nutrition:</strong>
+          <span class="badge bg-primary"
+            >Calories: <%= item.nutrition.calories %></span
+          >
+          <span class="badge bg-info"
+            >Protein: <%= item.nutrition.protein %>g</span
+          >
+          <span class="badge bg-warning"
+            >Carbs: <%= item.nutrition.carbs %>g</span
+          >
+          <span class="badge bg-danger">Fat: <%= item.nutrition.fat %>g</span>
+        </p>
+
+        <!-- Allergen Information -->
+        <% if (item.allergens.length > 0) { %>
+        <p class="card-text">
+          <strong>Allergens:</strong>
+          <% item.allergens.forEach(allergen => { %>
+          <span class="badge bg-danger"><%= allergen %></span>
+          <% }) %>
+        </p>
+        <% } %>
+
+        <!-- Edit and Delete Buttons -->
+        <button
+          class="btn btn-warning btn-sm edit-btn"
+          data-id="<%= item._id %>"
+          data-title="<%= item.title %>"
+          data-category="<%= item.category %>"
+          data-price="<%= item.price %>"
+          data-stock="<%= item.stock %>"
+          data-vendor="<%= item.vendor._id %>"
+          data-nutrition="<%= JSON.stringify(item.nutrition) %>"
+          data-allergens="<%= JSON.stringify(item.allergens) %>"
+          data-image="<%= item.image_url %>"
+          data-bs-toggle="modal"
+          data-bs-target="#editItemModal"
+        >
+          Edit
+        </button>
+
+        <button
+          class="btn btn-danger btn-sm delete-btn"
+          data-id="<%= item._id %>"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+  <% }) %>
+</div>
+
+<!-- Pagination -->
+<nav>
+  <ul class="pagination justify-content-center" id="pagination"></ul>
+</nav>
+
+<!-- Add Item Modal -->
+<div
+  class="modal fade"
+  id="addItemModal"
+  tabindex="-1"
+  aria-labelledby="addItemModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Menu Item</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="addItemForm">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="vendor" class="form-label">Vendor</label>
+            <select class="form-select" id="vendor" required>
+              <% vendors.forEach(vendor => { %>
+              <option value="<%= vendor._id %>"><%= vendor.name %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <select class="form-select" id="category" required>
+              <option value="Veg">Veg</option>
+              <option value="Non-Veg">Non-Veg</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" class="form-control" id="price" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="stock" class="form-label">Stock</label>
+            <input type="number" class="form-control" id="stock" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="image_url" class="form-label">Image URL</label>
+            <input type="text" class="form-control" id="image_url" />
+          </div>
+
+          <h6>Nutrition Information</h6>
+          <div class="row">
+            <div class="col">
+              <label for="calories" class="form-label">Calories</label>
+              <input type="number" class="form-control" id="calories" />
+            </div>
+            <div class="col">
+              <label for="protein" class="form-label">Protein (g)</label>
+              <input type="number" class="form-control" id="protein" />
+            </div>
+            <div class="col">
+              <label for="carbs" class="form-label">Carbs (g)</label>
+              <input type="number" class="form-control" id="carbs" />
+            </div>
+            <div class="col">
+              <label for="fat" class="form-label">Fat (g)</label>
+              <input type="number" class="form-control" id="fat" />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="allergens" class="form-label"
+              >Allergens (comma-separated)</label
+            >
+            <input type="text" class="form-control" id="allergens" />
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Save Item</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="editItemModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Menu Item</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="editItemForm">
+          <input type="hidden" id="edit-id" />
+
+          <div class="mb-3">
+            <label for="edit-title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="edit-title" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="edit-vendor" class="form-label">Vendor</label>
+            <select class="form-select" id="edit-vendor" required>
+              <% vendors.forEach(vendor => { %>
+              <option value="<%= vendor._id %>"><%= vendor.name %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="edit-category" class="form-label">Category</label>
+            <select class="form-select" id="edit-category" required>
+              <option value="Veg">Veg</option>
+              <option value="Non-Veg">Non-Veg</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="edit-price" class="form-label">Price</label>
+            <input
+              type="number"
+              class="form-control"
+              id="edit-price"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="edit-stock" class="form-label">Stock</label>
+            <input
+              type="number"
+              class="form-control"
+              id="edit-stock"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="edit-image" class="form-label">Image URL</label>
+            <input type="text" class="form-control" id="edit-image" />
+          </div>
+
+          <h6>Nutrition Information</h6>
+          <div class="row">
+            <div class="col">
+              <label for="edit-calories" class="form-label">Calories</label>
+              <input type="number" class="form-control" id="edit-calories" />
+            </div>
+            <div class="col">
+              <label for="edit-protein" class="form-label">Protein (g)</label>
+              <input type="number" class="form-control" id="edit-protein" />
+            </div>
+            <div class="col">
+              <label for="edit-carbs" class="form-label">Carbs (g)</label>
+              <input type="number" class="form-control" id="edit-carbs" />
+            </div>
+            <div class="col">
+              <label for="edit-fat" class="form-label">Fat (g)</label>
+              <input type="number" class="form-control" id="edit-fat" />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="edit-allergens" class="form-label"
+              >Allergens (comma-separated)</label
+            >
+            <input type="text" class="form-control" id="edit-allergens" />
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Update Item
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  document.getElementById("search-box").addEventListener("keyup", function () {
+    let query = this.value.toLowerCase();
+    document.querySelectorAll(".menu-item").forEach((item) => {
+      let title = item.getAttribute("data-title");
+      item.style.display = title.includes(query) ? "block" : "none";
+    });
+  });
+
+  // Handle Edit Form Submission (Update Item)
+  document
+    .getElementById("editItemForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const itemId = document.getElementById("edit-id").value;
+      const formData = {
+        title: document.getElementById("edit-title").value,
+        category: document.getElementById("edit-category").value,
+        price: document.getElementById("edit-price").value,
+        stock: document.getElementById("edit-stock").value,
+        image_url:
+          document.getElementById("edit-image").value ||
+          "https://t3.ftcdn.net/jpg/02/57/21/40/360_F_257214005_63auIfr9KN0gTHt28w6G8hoP2k45ScyP.jpg",
+        vendor: document.getElementById("edit-vendor").value, // ✅ Ensure vendor is passed
+        nutrition: {
+          calories: document.getElementById("edit-calories").value || 0,
+          protein: document.getElementById("edit-protein").value || 0,
+          carbs: document.getElementById("edit-carbs").value || 0,
+          fat: document.getElementById("edit-fat").value || 0,
+        },
+        allergens: document
+          .getElementById("edit-allergens")
+          .value.split(",")
+          .map((a) => a.trim()),
+      };
+
+      try {
+        const response = await fetch(`/menu/update/${itemId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert("Menu Item Updated Successfully!");
+          location.reload();
+        } else {
+          alert("Error updating menu item: " + data.message);
+        }
+      } catch (error) {
+        alert("Server error while updating item.");
+        console.error("Update Error:", error);
+      }
+    });
+
+  // Populate Edit Form when clicking Edit button
+  document.querySelectorAll(".edit-btn").forEach((button) => {
+    button.addEventListener("click", function () {
+      document.getElementById("edit-id").value = this.getAttribute("data-id");
+      document.getElementById("edit-title").value =
+        this.getAttribute("data-title");
+      document.getElementById("edit-category").value =
+        this.getAttribute("data-category");
+      document.getElementById("edit-price").value =
+        this.getAttribute("data-price");
+      document.getElementById("edit-stock").value =
+        this.getAttribute("data-stock");
+      document.getElementById("edit-image").value =
+        this.getAttribute("data-image");
+      document.getElementById("edit-vendor").value =
+        this.getAttribute("data-vendor");
+
+      let nutritionData = JSON.parse(this.getAttribute("data-nutrition"));
+      document.getElementById("edit-calories").value = nutritionData.calories;
+      document.getElementById("edit-protein").value = nutritionData.protein;
+      document.getElementById("edit-carbs").value = nutritionData.carbs;
+      document.getElementById("edit-fat").value = nutritionData.fat;
+
+      let allergensData = JSON.parse(this.getAttribute("data-allergens"));
+      document.getElementById("edit-allergens").value =
+        allergensData.join(", ");
+    });
+  });
+
+  // PAGINATION
+  const itemsPerPage = 6;
+  let menuItems = document.querySelectorAll(".menu-item");
+  let totalPages = Math.ceil(menuItems.length / itemsPerPage);
+
+  function showPage(page) {
+    let start = (page - 1) * itemsPerPage;
+    let end = start + itemsPerPage;
+    menuItems.forEach((item, index) => {
+      item.style.display = index >= start && index < end ? "block" : "none";
+    });
+  }
+
+  function renderPagination() {
+    let paginationContainer = document.getElementById("pagination");
+    paginationContainer.innerHTML = "";
+    if (totalPages > 1) {
+      // ✅ Only show pagination if more than 1 page
+      for (let i = 1; i <= totalPages; i++) {
+        let li = document.createElement("li");
+        li.classList.add("page-item");
+        if (i === 1) li.classList.add("active");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.addEventListener("click", function () {
+          showPage(i);
+          document
+            .querySelectorAll(".page-item")
+            .forEach((el) => el.classList.remove("active"));
+          li.classList.add("active");
+        });
+        paginationContainer.appendChild(li);
+      }
+    }
+  }
+
+  showPage(1);
+  renderPagination();
+
+  // Handle Add Item Form Submission
+  document
+    .getElementById("addItemForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = {
+        title: document.getElementById("title").value,
+        category: document.getElementById("category").value,
+        price: document.getElementById("price").value,
+        stock: document.getElementById("stock").value,
+        image_url:
+          document.getElementById("image_url").value ||
+          "https://t3.ftcdn.net/jpg/02/57/21/40/360_F_257214005_63auIfr9KN0gTHt28w6G8hoP2k45ScyP.jpg",
+        vendor: document.getElementById("vendor").value, // ✅ Ensure vendor is passed
+        nutrition: {
+          calories: document.getElementById("calories").value || 0,
+          protein: document.getElementById("protein").value || 0,
+          carbs: document.getElementById("carbs").value || 0,
+          fat: document.getElementById("fat").value || 0,
+        },
+        allergens: document
+          .getElementById("allergens")
+          .value.split(",")
+          .map((a) => a.trim()),
+      };
+
+      try {
+        const response = await fetch("/menu/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("✅ Menu Item Added Successfully!");
+          location.reload(); // Reload menu page after adding item
+        } else {
+          alert(
+            "❌ Error adding menu item: " + (data.message || "Unknown error")
+          );
+        }
+      } catch (error) {
+        alert("❌ Server error while adding item.");
+        console.error("Add Error:", error);
+      }
+    });
+</script>
+<%- include("partials/footer") %>
+<!-- Include Footer -->

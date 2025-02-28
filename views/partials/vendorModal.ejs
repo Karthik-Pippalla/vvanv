@@ -1,0 +1,46 @@
+<div
+  class="modal fade"
+  id="addItemModal"
+  tabindex="-1"
+  aria-labelledby="addItemModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Item to Vendor</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form action="/vendors/add-item" method="POST">
+          <input type="hidden" name="vendorId" id="vendorId" />
+
+          <div class="mb-3">
+            <label class="form-label">Item Name</label>
+            <input type="text" class="form-control" name="title" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select class="form-control" name="category">
+              <option value="Veg">Veg</option>
+              <option value="Non-Veg">Non-Veg</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Price</label>
+            <input type="number" class="form-control" name="price" required />
+          </div>
+
+          <button type="submit" class="btn btn-success w-100">Add Item</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
