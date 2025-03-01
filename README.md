@@ -45,47 +45,6 @@ The **Catering Admin Dashboard** is a **web-based system** built using **Node.js
 
 ---
 
-## 📂 Folder Structure
-
-```
-/catering-admin-dashboard
-│── /config
-│   ├── db.js          # MongoDB connection setup
-│── /controllers
-│   ├── adminController.js
-│   ├── menuController.js
-│   ├── orderController.js
-│   ├── vendorController.js
-│── /models
-│   ├── Admin.js
-│   ├── Menu.js
-│   ├── Order.js
-│   ├── Vendor.js
-│   ├── Customer.js
-│── /routes
-│   ├── adminRoutes.js
-│   ├── menuRoutes.js
-│   ├── orderRoutes.js
-│   ├── vendorRoutes.js
-│── /views
-│   ├── dashboard.ejs
-│   ├── menu.ejs
-│   ├── orders.ejs
-│   ├── vendors.ejs
-│   ├── vendorDetails.ejs
-│── /public
-│   ├── /css
-│   ├── /js
-│── /utils
-│   ├── authMiddleware.js
-│── .env
-│── app.js
-│── package.json
-│── README.md
-```
-
----
-
 ## 🛠️ Installation & Setup
 
 ### **1️⃣ Clone the Repository**
