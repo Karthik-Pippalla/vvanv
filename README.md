@@ -1,5 +1,3 @@
-Here’s a **complete `README.md`** file that includes **full project documentation** along with **all necessary code snippets** for setup, database models, routes, controllers, and views.
-
 ---
 
 ### 📌 **Create a New File**  
